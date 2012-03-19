@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Editor</title>
+  <link type="text/css" rel="stylesheet" href="js/vendor/bootstrap/css/bootstrap.min.css" />
+  <style type="text/css" media="screen">
+	body {
+        overflow: hidden;
+    }
+    
+    #editor { 
+        margin: 0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+	form {
+		padding:0;
+		margin: 0;
+	}
+
+	.tools {
+		position: absolute;
+		right: 16px;
+		bottom: 16px;
+		z-index: 5;
+	}
+  </style>
+</head>
+<body>
+<pre id="editor">function foo(items) {
+    var i;
+    for (i = 0; i &lt; items.length; i++) {
+        alert("Ace Rocks " + items[i]);
+    }
+}</pre>
+<div class="tools">
+	<form action="/save" method="post" id="codeform" class="form-inline">
+		<input type="hidden" name="code" id="code"  />
+		<input type="text" name="filename" id="filename" placeholder="filename..." />
+			<a href="#" id="load" class="btn btn-primary" name="load">Load file</a>
+			<a href="#" id="save" class="btn btn-success" name="Save">Save file</a>
+			<a href="#" id="clear" class="btn btn-warning" name="Save">Clear editor</a>
+	</form>
+</div>    
+<script src="js/vendor/ace-0.2.0/src/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/vendor/ace-0.2.0/src/theme-textmate.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/vendor/ace-0.2.0/src/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/vendor/jquery/jquery.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/vendor/crockford/json2.js" type="text/javasctipt" charset="utf-8"></script>
+<script>
+
+$(document).ready(function () {
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/textmate");
+    
+    var JavaScriptMode = require("ace/mode/javascript").Mode;
+    editor.getSession().setMode(new JavaScriptMode());
+
+	$('body').on('click.file', '#load', function () {
+		//editor.getSession().getValue()
+		$('#load').attr('href', 'examples/' + $('#filename').val());
+		
+	});	
+
+	$('body').on('click.file', '#save', function () {
+		//editor.getSession().getValue()
+		$('#code').val(JSON.stringify(editor.getSession().getValue()));
+		$.post('http://localhost:4567/save', $("#codeform").serialize(), function(data) {
+			console.log(data);
+		});
+	});	
+})
+</script>
+</body>
+</html>
